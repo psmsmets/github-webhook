@@ -31,10 +31,13 @@ A lightweight and simple php script to validate and handle Github's webhooks cen
             "branch": "master",
             "event": "push",
             "action": "a new version has been deployed",
-            "run": "/home/bin/deploy.sh 2>&1"
+            "run": "/home/bin/deploy.sh -v"
+            "log": "deploy.log"
         }
     ]
 }
 ```
+
+Once the script is started you receive an email with the pid and a link to the log file.
 
 That's it.

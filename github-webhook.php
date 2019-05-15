@@ -4,8 +4,8 @@
  *
  */
 // script errors will be send to this email:
-$error_mail = "name@example.com";
-$error_from = "noreply@example.com";
+$error_mail = "..";
+$error_from = "..";
 
 class Handler
 {
@@ -79,9 +79,8 @@ class Handler
                 // execute update script, and record its output
                 ob_flush();
                 ob_start();
-                passthru($endpoint['run'], $err);
+                passthru(sprintf("%s > %s 2>&1 & echo $!", $endpoint['run'], $endpoint['log']), $err);
                 $output = ob_get_contents();
-                //$output = shell_exec($endpoint['run']);
                 // prepare and send the notification email
                 if (isset($headers)) {
                     // send mail to someone, and the github user who pushed the commit
@@ -109,10 +108,11 @@ class Handler
                         }
                         $body .= '</ul>';
                     }
-                    $body .= '<p>What follows is the output of the script:</p><pre>';
-                    $body .= $output . '</pre>';
+                    $body .= sprintf(
+                        "<p>Command (%s) started with pid=%s and <a href=\"%s\">logfile</a>.</p>",
+                        $endpoint['run'], $output, "https://$_SERVER[HTTP_HOST]/".$endpoint['log']);
                     if (!empty($err)) {
-                        $body .= '<p>with errors:</p><pre>' . $err . '</pre>';
+                        $body .= sprintf('<p>Returned error code <strong>%s</strong>!</p>', $err);
                     }
                     $body .= '<p>Cheers, <br/>Github Webhook Endpoint</p>';
                     mail($this->config['email']['to'], $endpoint['repository']." : ".$endpoint['action'], $body, $headers);
