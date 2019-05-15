@@ -4,7 +4,7 @@
  *
  */
 // script errors will be send to this email:
-$error_mail = "pieter@steps4it.be";
+$error_mail = "your_email";
 
 class Handler
 {
