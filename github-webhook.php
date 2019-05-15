@@ -61,10 +61,6 @@ class Handler
         if (!$this->validate()) {
             return false;
         }
-        // check if it is a push event
-        if (!array_key_exists('push',$this->payload['hook']['events'])) {
-            throw new Exception("A valid hook from Github has been delivered but it isn't a push event.\n");
-        }
         if (isset($this->config['email'])) {
             $headers = 'From: '.$this->config['email']['from']."\r\n";
             $headers .= 'CC: ' . $this->payload->pusher->email . "\r\n";
@@ -76,7 +72,8 @@ class Handler
         {
             // check if the push came from the right repository and branch
             if ( $this->payload['repository']['full_name'] == $endpoint['repository'] &&
-                 $this->payload['repository']['default_branch'] == $endpoint['branch']
+                 $this->payload['ref'] == 'refs/heads/'.$endpoint['branch'] &&
+                 $this->event == $endpoint['event']
                ) {
                 // execute update script, and record its output
                 ob_flush();
@@ -88,10 +85,15 @@ class Handler
                     // send mail to someone, and the github user who pushed the commit
                     $body = '<p>The Github user <a href="'. $this->payload['sender']['html_url'] 
                         . '">@' . $this->payload['sender']['login'] . '</a>'
-                        . ' has pushed to <a href="' . $this->payload['repository']['html_url'] 
+                        . ' has triggered (' . $this->event .') to <a href="' . $this->payload['repository']['html_url'] 
                         . '">' . $this->payload['repository']['full_name'] . '</a>'
                         . ' and consequently, ' . $endpoint['action']
                         . '.</p>';
+                    if ( array_key_exists('head_commit',$this->payload) ) {
+                        $body .= '<p>Trigger of the event: '. $this->payload['head_commit']['message'];
+                        $body .= ' on ' . $this->payload['head_commit']['timestamp'];
+                        $body .= ' <a href="' . $this->payload['head_commit']['url'] . '">url</a></p>';
+                    }
                     if ( array_key_exists('commits',$this->payload) ) {
                         $body .= '<p>Here\'s a brief list of what has been changed:</p>';
                         $body .= '<ul>';

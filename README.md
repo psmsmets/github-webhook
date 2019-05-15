@@ -29,6 +29,7 @@ A lightweight and simple php script to validate and handle Github's webhooks cen
         {
             "repository": "user/repository",
             "branch": "master",
+            "event": "push",
             "action": "a new version has been deployed",
             "run": "echo 'your deploy.sh script to be executed'"
         }
