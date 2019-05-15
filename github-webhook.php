@@ -4,7 +4,8 @@
  *
  */
 // script errors will be send to this email:
-$error_mail = "your_email";
+$error_mail = "name@example.com";
+$error_from = "noreply@example.com";
 
 class Handler
 {
@@ -80,6 +81,7 @@ class Handler
                 ob_start();
                 passthru($endpoint['run'], $err);
                 $output = ob_get_contents();
+                //$output = shell_exec($endpoint['run']);
                 // prepare and send the notification email
                 if (isset($headers)) {
                     // send mail to someone, and the github user who pushed the commit
@@ -108,7 +110,7 @@ class Handler
                         $body .= '</ul>';
                     }
                     $body .= '<p>What follows is the output of the script:</p><pre>';
-                    $body .= $output. '</pre>';
+                    $body .= $output . '</pre>';
                     if (!empty($err)) {
                         $body .= '<p>with errors:</p><pre>' . $err . '</pre>';
                     }
@@ -118,7 +120,7 @@ class Handler
                 return true;
             }
         } 
-        throw new Exception("A valid hook from Github has been delivered but it isn't an endpoint in your config.\n");
+        //throw new Exception("A valid hook from Github has been delivered but it isn't an endpoint in your config.\n");
     }
 }
 try {
@@ -128,5 +130,5 @@ try {
     }
 } catch ( Exception $e ) {
     $msg = $e->getMessage();
-    mail($error_mail, $msg, ''.$e);
+    mail($error_mail, $msg, ''.$e, "From: $error_from\r\n");
 }
