@@ -11,8 +11,6 @@ A lightweight and simple php script to validate and handle Github's webhooks cen
    * Payload URL = `https://yourdomain/github-webhook.php`
    * Content type = `application/json`
    * Secret = `your secret`
-   * If you push everything the changes will be added to the notification email.
-
 
 1. Create a configuration file, for example, `config.json`, outside your pubic html folder
 
